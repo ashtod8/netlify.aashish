@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+// ✅ Move this outside the component to avoid ESLint warning
+const calculateWinner = (squares) => {
+  const lines = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+    [0, 4, 8], [2, 4, 6],
+  ];
+  for (let [a, b, c] of lines) {
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+};
+
 const App = () => {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
@@ -8,20 +23,6 @@ const App = () => {
   const [scores, setScores] = useState({ X: 0, O: 0 });
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isComputerOpponent, setIsComputerOpponent] = useState(false);
-
-  const calculateWinner = (squares) => {
-    const lines = [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8],
-      [0, 3, 6], [1, 4, 7], [2, 5, 8],
-      [0, 4, 8], [2, 4, 6],
-    ];
-    for (let [a, b, c] of lines) {
-      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return squares[a];
-      }
-    }
-    return null;
-  };
 
   const makeComputerMove = (newBoard) => {
     const emptyIndexes = newBoard.map((val, idx) => val === null ? idx : null).filter(v => v !== null);
@@ -44,7 +45,7 @@ const App = () => {
       const newBoard = [...board];
       setTimeout(() => makeComputerMove(newBoard), 500);
     }
-  }, [board]);
+  }, [board, isComputerOpponent, xIsNext]); // ✅ Dependencies
 
   const handleClick = (index) => {
     if (board[index] || winner) return;
